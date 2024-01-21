@@ -1,10 +1,11 @@
-import './global.css';
+import './global.css'
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/button'
 
 export function App() {
   return (
-    <Button>Hello World</Button>
+    <div className="flex h-screen items-center justify-center">
+      <Button>Hello World</Button>
+    </div>
   )
 }
-
