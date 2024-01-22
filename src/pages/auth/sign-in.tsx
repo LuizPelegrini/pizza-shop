@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useToast } from '@/components/ui/Toast'
 
 const signInFormSchema = z.object({
   email: z.string().email(),
@@ -18,9 +19,34 @@ export const SignIn = () => {
     handleSubmit,
     formState: { isSubmitting },
   } = useForm<SignInFormSchema>()
+  const { toast } = useToast()
 
   const handleSignIn = async (data: SignInFormSchema) => {
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+      throw new Error()
+      toast({
+        title: 'Authentication link sent to your email',
+        variant: 'success',
+      })
+    } catch {
+      const { dismiss } = toast({
+        title: 'Invalid credentials',
+        variant: 'failure',
+        action: (
+          <Button
+            size="sm"
+            variant="failure"
+            onClick={() => {
+              dismiss()
+              handleSignIn(data)
+            }}
+          >
+            Resend
+          </Button>
+        ),
+      })
+    }
   }
 
   return (
