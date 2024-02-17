@@ -27,7 +27,7 @@ export const OrdersPage = () => {
                 <TableRow>
                   <TableHead className="w-[64px]"></TableHead>
                   <TableHead className="w-[140px]">Identifier</TableHead>
-                  <TableHead className="w-[180px]">From</TableHead>
+                  <TableHead className="w-[180px]">Created</TableHead>
                   <TableHead className="w-[140px]">Status</TableHead>
                   <TableHead>Client</TableHead>
                   <TableHead className="w-[140px]">Order total</TableHead>
