@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/components/ui/Toast'
+import { useMutation } from '@tanstack/react-query'
+import { registerRestaurant } from '@/api/register-restaurant'
 
 const signUpFormSchema = z.object({
   restaurantName: z.string(),
@@ -24,12 +26,18 @@ export const SignUp = () => {
     formState: { isSubmitting },
   } = useForm<SignUpFormSchema>()
   const { toast } = useToast()
+  const { mutateAsync: registerRestaurantFn } = useMutation({
+    mutationFn: registerRestaurant
+  });
 
   const handleSignUp = async (data: SignUpFormSchema) => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-
-      console.log(data)
+      await registerRestaurantFn({
+        restaurantName: data.restaurantName,
+        managerName: data.managerName,
+        email: data.email,
+        phone: data.phone
+      })
 
       const { dismiss } = toast({
         title: 'Restaurant successfully created!',
@@ -41,7 +49,7 @@ export const SignUp = () => {
             className="border-success-foreground bg-transparent hover:bg-transparent"
             onClick={() => dismiss()}
           >
-            <Link to="/sign-in">Login</Link>
+            <Link to={`/sign-in?email=${data.email}`}>Login</Link>
           </Button>
         ),
       })
