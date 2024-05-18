@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/components/ui/Toast'
+import { useMutation } from '@tanstack/react-query'
+import { signIn } from '@/api/sign-in'
 
 const signInFormSchema = z.object({
   email: z.string().email(),
@@ -21,10 +23,13 @@ export const SignIn = () => {
     formState: { isSubmitting },
   } = useForm<SignInFormSchema>()
   const { toast } = useToast()
+  const { mutateAsync: authenticate } = useMutation({
+    mutationFn: signIn
+  });
 
   const handleSignIn = async (data: SignInFormSchema) => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+      await authenticate({ email: data.email })
       toast({
         title: 'Authentication link sent to your email',
         variant: 'success',
