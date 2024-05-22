@@ -1,13 +1,12 @@
 import { api } from "@/lib/axios"
 
 type GetManagedRestaurantResponse = {
-  id: string;
   name: string;
-  email: string;
-  phone: string | null;
-  role: "manager" | "customer";
+  id: string;
   createdAt: Date | null;
   updatedAt: Date | null;
+  description: string | null;
+  managerId: string | null;
 }
 
 export const getManagedRestaurant = async () => {
