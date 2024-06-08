@@ -14,7 +14,7 @@ import { DialogClose } from "@radix-ui/react-dialog"
 
 const storeProfileSchema = z.object({
   name: z.string().min(1, { message: 'Required'}),
-  description: z.string().min(1)
+  description: z.string().nullable()
 })
 
 type StoreProfileSchema = z.infer<typeof storeProfileSchema>;
@@ -28,22 +28,37 @@ export const StoreProfileDialog = () => {
     staleTime: Infinity
   })
 
-  const { mutateAsync: updateProfileFn } = useMutation({
+  const { mutateAsync: updateProfileFn, isPending } = useMutation({
     mutationFn: updateProfile,
-    onSuccess(_, { name, description }) {
-      const cached = queryClient.getQueryData<GetManagedRestaurantResponse>(['managed-restaurant'])
+    // onMutate is fired as soon as updateProfileFn is called (regardless whether it succeeded or not)
+    onMutate({ name, description }) {
+      const previousRestaurantInfo = updateManagedRestaurantCache({ name, description })
 
-      if(cached) {
-        queryClient.setQueryData<GetManagedRestaurantResponse>(['managed-restaurant'], {
-          ...cached,
-          name,
-          description,
-        })
+      // everything returned by onMutate function is added to the mutation context
+      return { previousRestaurantInfo }
+    },
+    onError(_error, _variables, context) {
+      if(context?.previousRestaurantInfo) {
+        updateManagedRestaurantCache(context.previousRestaurantInfo)
       }
     },
   })
+
+  const updateManagedRestaurantCache = ({ name, description }: StoreProfileSchema) => {
+    const cached = queryClient.getQueryData<GetManagedRestaurantResponse>(['managed-restaurant'])
+
+    if(cached) {
+      queryClient.setQueryData<GetManagedRestaurantResponse>(['managed-restaurant'], {
+        ...cached,
+        name,
+        description,
+      })
+    }
+
+    return cached;
+  }
   
-  const { handleSubmit, register, formState: { isSubmitting } } = useForm<StoreProfileSchema>({
+  const { handleSubmit, register } = useForm<StoreProfileSchema>({
     values: {
       name: managedRestaurant?.name || '',
       description: managedRestaurant?.description || ''
@@ -87,9 +102,9 @@ export const StoreProfileDialog = () => {
         </div>
         <DialogFooter>
           <DialogClose asChild>
-            <Button type="button" variant="ghost" disabled={isSubmitting}>Cancel</Button>
+            <Button type="button" variant="ghost" disabled={isPending}>Cancel</Button>
           </DialogClose>
-          <Button type="submit" variant="success" disabled={isSubmitting}>Save</Button>
+          <Button type="submit" variant="success" disabled={isPending}>Save</Button>
         </DialogFooter>
       </form>
     </DialogContent>
