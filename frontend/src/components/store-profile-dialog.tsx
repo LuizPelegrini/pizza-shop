@@ -5,9 +5,12 @@ import { Input } from "./ui/input"
 import { Label } from "./ui/label"
 import { Textarea } from "./ui/textarea"
 import { useForm } from "react-hook-form"
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import { getManagedRestaurant } from "@/api/get-managed-restaurant"
 import { zodResolver } from '@hookform/resolvers/zod'
+import { updateProfile } from "@/api/update-profile"
+import { useToast } from "./ui/Toast"
+import { DialogClose } from "@radix-ui/react-dialog"
 
 const storeProfileSchema = z.object({
   name: z.string().min(1, { message: 'Required'}),
@@ -21,15 +24,20 @@ export const StoreProfileDialog = () => {
     queryKey: ['get-managed-restaurant'],
     queryFn: getManagedRestaurant
   })
+
+  const { mutateAsync: updateProfileFn } = useMutation({
+    mutationFn: updateProfile
+  })
   
-  const { handleSubmit, register } = useForm<StoreProfileSchema>({
+  const { handleSubmit, register, formState: { isSubmitting } } = useForm<StoreProfileSchema>({
     values: {
       name: managedRestaurant?.name || '',
       description: managedRestaurant?.description || ''
     },
     resolver: zodResolver(storeProfileSchema)
   });
-  
+
+  const { toast } = useToast()
 
   return (
     <DialogContent>
@@ -38,7 +46,20 @@ export const StoreProfileDialog = () => {
         <DialogDescription>Update store profile visible to your customers</DialogDescription>
       </DialogHeader>
 
-      <form onSubmit={handleSubmit(() => {})}>
+      <form onSubmit={handleSubmit(async ({ name, description }) => {
+        try {
+          await updateProfileFn({ name, description })
+          toast({
+            variant: 'success',
+            title: 'Profile successfully updated',
+          })
+        } catch {
+          toast({
+            variant: 'failure',
+            title: 'Profile could not be updated',
+          })
+        }
+      })}>
         <div className="space-y-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
             <Label className="text-right" htmlFor="name" >Name</Label>
@@ -51,8 +72,10 @@ export const StoreProfileDialog = () => {
           </div>
         </div>
         <DialogFooter>
-          <Button type="button" variant="ghost">Cancel</Button>
-          <Button type="submit" variant="success">Save</Button>
+          <DialogClose asChild>
+            <Button type="button" variant="ghost" disabled={isSubmitting}>Cancel</Button>
+          </DialogClose>
+          <Button type="submit" variant="success" disabled={isSubmitting}>Save</Button>
         </DialogFooter>
       </form>
     </DialogContent>
