@@ -17,15 +17,16 @@ import { Dialog, DialogTrigger } from './ui/dialog'
 import { StoreProfileDialog } from './store-profile-dialog'
 
 export const AccountMenu = () => {
-
   const { data: profile, isLoading: isGetProfileLoading} = useQuery({
     queryKey: ['get-profile'],
-    queryFn: getProfile
+    queryFn: getProfile,
+    staleTime: Infinity
   })
 
   const { data: managedRestaurant, isLoading: isGetManagedRestaurantLoading } = useQuery({
     queryKey: ['get-managed-restaurant'],
-    queryFn: getManagedRestaurant
+    queryFn: getManagedRestaurant,
+    staleTime: Infinity
   })
 
   return (

@@ -22,7 +22,8 @@ type StoreProfileSchema = z.infer<typeof storeProfileSchema>;
 export const StoreProfileDialog = () => {  
   const { data: managedRestaurant } = useQuery({
     queryKey: ['get-managed-restaurant'],
-    queryFn: getManagedRestaurant
+    queryFn: getManagedRestaurant,
+    staleTime: Infinity
   })
 
   const { mutateAsync: updateProfileFn } = useMutation({
