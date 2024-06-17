@@ -4,27 +4,34 @@ import {
   ChevronsLeft,
   ChevronsRight,
 } from 'lucide-react'
-import { FC } from 'react'
+import { FC, MouseEventHandler } from 'react'
 
 import { Button } from './ui/button'
+import { useSearchParams } from 'react-router-dom'
 
 type PaginationProps = {
-  pageIndex: number
   totalCount: number
   perPage: number
-  onPageChange: (pageIndex: number) => void
 }
 
 export const Pagination: FC<PaginationProps> = ({
-  pageIndex,
   totalCount,
   perPage,
-  onPageChange
 }) => {
-  const pages = Math.ceil(totalCount / perPage) || 1
+  const [searchParams, setSearchParams] = useSearchParams();
+  const currentPage = Number(searchParams.get('page') ?? '1');
 
-  const isFirstPage = pageIndex === 0;
-  const isLastPage = pageIndex === pages - 1;
+  const lastPage = Math.ceil(totalCount / perPage) || 1
+
+  const isFirstPage = currentPage === 1;
+  const isLastPage = currentPage === lastPage;
+
+  const handlePageChange = (page: number) => {
+    setSearchParams(state => {
+      state.set('page', String(page))
+      return state;
+    })
+  }
 
   return (
     <div className="flex items-center justify-between">
@@ -34,13 +41,13 @@ export const Pagination: FC<PaginationProps> = ({
 
       <div className="flex items-center gap-6 lg:gap-8">
         <div className="text-sm font-medium">
-          Page {pageIndex + 1} of {pages}
+          Page {currentPage} of {lastPage}
         </div>
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
             size="icon"
-            onClick={() => onPageChange(0)}
+            onClick={() => handlePageChange(1)}
             disabled={isFirstPage}
           >
             <ChevronsLeft className="size-4" />
@@ -50,7 +57,7 @@ export const Pagination: FC<PaginationProps> = ({
           <Button
             variant="outline"
             size="icon"
-            onClick={() => onPageChange(pageIndex - 1)}
+            onClick={() => handlePageChange(currentPage - 1)}
             disabled={isFirstPage}
           >
             <ChevronLeft className="size-4" />
@@ -60,7 +67,7 @@ export const Pagination: FC<PaginationProps> = ({
           <Button
             variant="outline"
             size="icon"
-            onClick={() => onPageChange(pageIndex + 1)}
+            onClick={() => handlePageChange(currentPage + 1)}
             disabled={isLastPage}
           >
             <ChevronRight className="size-4" />
@@ -70,7 +77,7 @@ export const Pagination: FC<PaginationProps> = ({
           <Button
             variant="outline"
             size="icon"
-            onClick={() => onPageChange(pages - 1)}
+            onClick={() => handlePageChange(lastPage)}
             disabled={isLastPage}
           >
             <ChevronsRight className="size-4" />

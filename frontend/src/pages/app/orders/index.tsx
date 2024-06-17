@@ -24,10 +24,18 @@ export const OrdersPage = () => {
     .transform(page => page - 1)
     .parse(searchParams.get('page') ?? '1')
 
+  const orderId = searchParams.get('orderId');
+  const clientName = searchParams.get('clientName');
+  const status = searchParams.get('status');
 
   const { data: result } = useQuery({
     queryKey: ['orders', String(searchParams)],
-    queryFn: () => getOrders({ pageIndex })
+    queryFn: () => getOrders({
+      pageIndex, 
+      ...(orderId && { orderId }),
+      ...(clientName && { customerName: clientName }),
+      ...(status !== 'all' && { status }),
+    })
   })
 
   return (
@@ -62,15 +70,8 @@ export const OrdersPage = () => {
 
           {result && (
             <Pagination
-              pageIndex={result.meta.pageIndex}
               totalCount={result.meta.totalCount}
               perPage={result.meta.perPage}
-              onPageChange={(pageIndex) => {
-                setSearchParams((prev) => {
-                  prev.set('page', String(pageIndex + 1))
-                  return prev;
-                })
-              }}
             />
           )}
         </div>
