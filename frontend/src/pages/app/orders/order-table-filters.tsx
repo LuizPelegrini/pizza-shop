@@ -13,7 +13,6 @@ import { z } from 'zod'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useSearchParams } from 'react-router-dom'
-import { FC } from 'react'
 
 const orderFiltersSchema = z.object({
   orderId: z.string().optional(),

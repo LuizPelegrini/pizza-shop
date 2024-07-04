@@ -9,6 +9,7 @@ import { OrderStatus } from './order-status'
 
 import { formatDistanceToNow } from 'date-fns';
 import { enUS } from 'date-fns/locale'
+import { formatPrice } from '@/utils/currency-formatter'
 
 type OrderTableRowProps = {
   order: {
@@ -26,7 +27,7 @@ export const OrderTableRow: FC<OrderTableRowProps> = ({order}) => {
   return (
     <TableRow>
       <TableCell>
-        <OrderDetails />
+        <OrderDetails orderId={order.orderId} />
       </TableCell>
       <TableCell className="font-mono text-xs font-medium">
         {orderId}
@@ -39,10 +40,7 @@ export const OrderTableRow: FC<OrderTableRowProps> = ({order}) => {
       </TableCell>
       <TableCell className="font-medium">{customerName}</TableCell>
       <TableCell className="font-medium">
-        {total.toLocaleString('en-US', {
-          style: 'currency',
-          currency: 'USD'
-        })}
+        {formatPrice(total / 100)}
       </TableCell>
       <TableCell>
         <Button variant="outline" size="xs">
