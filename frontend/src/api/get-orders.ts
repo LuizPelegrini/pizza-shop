@@ -1,6 +1,6 @@
 import { api } from "@/lib/axios"
 
-type GetOrdersResponse = {
+export type GetOrdersResponse = {
   orders: {
     orderId: string;
     createdAt: string;

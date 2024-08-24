@@ -1,6 +1,6 @@
 import { FC, ReactNode } from "react";
 
-type Status = "pending" | "canceled" | "processing" | "delivering" | "delivered";
+export type Status = "pending" | "canceled" | "processing" | "delivering" | "delivered";
 
 type OrderStatusProps = {
   status: Status
