@@ -6,20 +6,13 @@ import {
   PieChart,
   PieLabelRenderProps,
   ResponsiveContainer,
-  Tooltip,
 } from 'recharts'
 import colors from 'tailwindcss/colors'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
-
-const data = [
-  { product: 'Pepperoni', quantity: 23 },
-  { product: 'Margherita', quantity: 45 },
-  { product: 'Cinco Formaggi', quantity: 12 },
-  { product: 'Hawaiinan', quantity: 3 },
-  { product: 'Chocolate', quantity: 4 },
-]
+import { useQuery } from '@tanstack/react-query'
+import { getPopularProducts } from '@/api/get-popular-products'
 
 const COLORS = [
   colors.sky['500'],
@@ -32,6 +25,11 @@ const COLORS = [
 export const PopularProductsChart: FC<
   ComponentPropsWithoutRef<typeof Card>
 > = ({ className, ...props }) => {
+  const { data: popularProducts } = useQuery({
+    queryKey: ['metrics', 'popular-products'],
+    queryFn: getPopularProducts
+  })
+
   return (
     <Card className={cn('bg-transparent', className)} {...props}>
       <CardHeader className="pb-8">
@@ -41,31 +39,33 @@ export const PopularProductsChart: FC<
         </div>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={240}>
-          <PieChart style={{ fontSize: 12 }}>
-            <Pie
-              data={data}
-              strokeWidth={8}
-              dataKey="quantity"
-              nameKey="product"
-              cx="50%"
-              cy="50%"
-              outerRadius={100}
-              innerRadius={70}
-              label={CustomLabel}
-              labelLine={false}
-              className="outline-none"
-            >
-              {data.map((_, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={COLORS[index]}
-                  className="stroke-background outline-none transition-opacity hover:opacity-80"
-                />
-              ))}
-            </Pie>
-          </PieChart>
-        </ResponsiveContainer>
+        {popularProducts && (
+          <ResponsiveContainer width="100%" height={240}>
+            <PieChart style={{ fontSize: 12 }}>
+              <Pie
+                data={popularProducts}
+                strokeWidth={8}
+                dataKey="amount"
+                nameKey="product"
+                cx="50%"
+                cy="50%"
+                outerRadius={100}
+                innerRadius={70}
+                label={CustomLabel}
+                labelLine={false}
+                className="outline-none"
+              >
+                {popularProducts.map((_, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index]}
+                    className="stroke-background outline-none transition-opacity hover:opacity-80"
+                  />
+                ))}
+              </Pie>
+            </PieChart>
+          </ResponsiveContainer>
+        )}
       </CardContent>
     </Card>
   )
@@ -78,10 +78,8 @@ const CustomLabel: FC<PieLabelRenderProps> = ({
   innerRadius,
   outerRadius,
   value,
-  index,
+  name
 }) => {
-  if (!innerRadius || !outerRadius || !index) return null
-
   const RADIAN = Math.PI / 180
   const radius =
     12 + Number(innerRadius) + (Number(outerRadius) - Number(innerRadius))
@@ -96,9 +94,9 @@ const CustomLabel: FC<PieLabelRenderProps> = ({
       textAnchor={x > Number(cx) ? 'start' : 'end'}
       dominantBaseline="central"
     >
-      {data[index].product.length > 12
-        ? data[index].product.substring(0, 12).concat('...')
-        : data[index].product}{' '}
+      {name.length > 12
+        ? name.substring(0, 12).concat('...')
+        : name}{' '}
       ({value})
     </text>
   )
