@@ -22,6 +22,7 @@ import { getDailyRevenueInPeriod } from '@/api/get-daily-revenue-in-period'
 import { DateRangePicker } from '@/components/ui/date-range-picker'
 import { DateRange } from 'react-day-picker'
 import { subDays } from 'date-fns'
+import { LoadingChartSpinner } from './loading-chart-spinner'
 
 export const RevenueChart: FC<ComponentPropsWithoutRef<typeof Card>> = ({
   className,
@@ -32,12 +33,11 @@ export const RevenueChart: FC<ComponentPropsWithoutRef<typeof Card>> = ({
     to: new Date()
   })
 
-  const { data: dailyRevenueInPeriod, error } = useQuery({
+  const { data: dailyRevenueInPeriod } = useQuery({
     queryKey: ['metrics', 'daily-revenue-in-period', dateRange],
     queryFn: async () => {
       return getDailyRevenueInPeriod({ from: dateRange?.from, to: dateRange?.to })
     },
-    retry: false // if backend respond with error, we dont want to retry but throw the error immediately
   })
 
   return (
@@ -53,7 +53,7 @@ export const RevenueChart: FC<ComponentPropsWithoutRef<typeof Card>> = ({
         </div>
       </CardHeader> 
       <CardContent>
-        {dailyRevenueInPeriod && (
+        {dailyRevenueInPeriod ? (
           <ResponsiveContainer width="100%" height={240}>
             <LineChart data={dailyRevenueInPeriod} style={{ fontSize: 12 }}>
               <XAxis
@@ -84,7 +84,7 @@ export const RevenueChart: FC<ComponentPropsWithoutRef<typeof Card>> = ({
               />
             </LineChart>
           </ResponsiveContainer>
-        )}
+        ) : <LoadingChartSpinner />}
       </CardContent>
     </Card>
   )

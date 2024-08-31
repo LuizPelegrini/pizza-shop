@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import { useQuery } from '@tanstack/react-query'
 import { getPopularProducts } from '@/api/get-popular-products'
+import { LoadingChartSpinner } from './loading-chart-spinner'
 
 const COLORS = [
   colors.sky['500'],
@@ -39,7 +40,7 @@ export const PopularProductsChart: FC<
         </div>
       </CardHeader>
       <CardContent>
-        {popularProducts && (
+        {popularProducts ? (
           <ResponsiveContainer width="100%" height={240}>
             <PieChart style={{ fontSize: 12 }}>
               <Pie
@@ -65,7 +66,7 @@ export const PopularProductsChart: FC<
               </Pie>
             </PieChart>
           </ResponsiveContainer>
-        )}
+        ) :  <LoadingChartSpinner />}
       </CardContent>
     </Card>
   )
