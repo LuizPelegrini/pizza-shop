@@ -1,4 +1,4 @@
-import { ComponentPropsWithoutRef, FC } from 'react'
+import { ComponentPropsWithoutRef, FC, useState } from 'react'
 import {
   CartesianGrid,
   Line,
@@ -19,14 +19,25 @@ import {
 import { cn } from '@/lib/utils'
 import { useQuery } from '@tanstack/react-query'
 import { getDailyRevenueInPeriod } from '@/api/get-daily-revenue-in-period'
+import { DateRangePicker } from '@/components/ui/date-range-picker'
+import { DateRange } from 'react-day-picker'
+import { subDays } from 'date-fns'
 
 export const RevenueChart: FC<ComponentPropsWithoutRef<typeof Card>> = ({
   className,
   ...props
 }) => {
-  const { data: dailyRevenueInPeriod } = useQuery({
-    queryKey: ['metrics', 'daily-revenue-in-period'],
-    queryFn: getDailyRevenueInPeriod
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: subDays(new Date(), 7),
+    to: new Date()
+  })
+
+  const { data: dailyRevenueInPeriod, error } = useQuery({
+    queryKey: ['metrics', 'daily-revenue-in-period', dateRange],
+    queryFn: async () => {
+      return getDailyRevenueInPeriod({ from: dateRange?.from, to: dateRange?.to })
+    },
+    retry: false // if backend respond with error, we dont want to retry but throw the error immediately
   })
 
   return (
@@ -36,7 +47,11 @@ export const RevenueChart: FC<ComponentPropsWithoutRef<typeof Card>> = ({
           <CardTitle>Revenue</CardTitle>
           <CardDescription>Daily revenue</CardDescription>
         </div>
-      </CardHeader>
+        <div className='flex items-center gap-3'>
+          <label htmlFor="date-picker">Date range:</label>
+          <DateRangePicker date={dateRange} onDateRangeChange={setDateRange}/>
+        </div>
+      </CardHeader> 
       <CardContent>
         {dailyRevenueInPeriod && (
           <ResponsiveContainer width="100%" height={240}>
@@ -56,7 +71,7 @@ export const RevenueChart: FC<ComponentPropsWithoutRef<typeof Card>> = ({
                   Intl.NumberFormat('en-US', {
                     style: 'currency',
                     currency: 'USD',
-                  }).format(value)
+                  }).format(value / 100)
                 }
               />
               <CartesianGrid vertical={false} className="stroke-muted" />
