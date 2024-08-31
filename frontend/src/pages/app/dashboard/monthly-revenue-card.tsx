@@ -3,6 +3,7 @@ import { DollarSign } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useQuery } from '@tanstack/react-query'
 import { getMonthRevenue } from '@/api/get-month-revenue'
+import { MetricsCardSkeleton } from './metrics-card-skeleton'
 
 export const MonthlyRevenueCard = () => {
   const { data: monthRevenue } = useQuery({
@@ -19,7 +20,7 @@ export const MonthlyRevenueCard = () => {
         <DollarSign className="size-4 text-muted-foreground" />
       </CardHeader>
       <CardContent className="space-y-1">
-        {monthRevenue && (
+        {monthRevenue ? (
           <>
             <span className="text-2xl font-bold tracking-tight">{(monthRevenue.receipt / 100).toLocaleString('en-US', {
               style: 'currency',
@@ -39,7 +40,7 @@ export const MonthlyRevenueCard = () => {
               )}
             </p>
           </>
-        )}
+        ) : <MetricsCardSkeleton />}
       </CardContent>
     </Card>
   )
