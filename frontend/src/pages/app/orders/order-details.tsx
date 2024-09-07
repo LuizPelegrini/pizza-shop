@@ -25,6 +25,7 @@ import { OrderStatus } from './order-status'
 import { formatDistanceToNow } from 'date-fns';
 import { enUS } from 'date-fns/locale'
 import { formatPrice } from '@/utils/currency-formatter'
+import { OrderDetailsSkeleton } from './order-details-skeleton'
 
 type OrderDetailsProps = {
   orderId: string;
@@ -54,7 +55,7 @@ export const OrderDetails: FC<OrderDetailsProps> = ({ orderId }) => {
           <DialogTitle>Order: {orderId }</DialogTitle>
           <DialogDescription>Order details</DialogDescription>
         </DialogHeader>
-        {order && (
+        {order ? (
           <div className="space-y-6">
             <Table>
               <TableBody>
@@ -124,6 +125,8 @@ export const OrderDetails: FC<OrderDetailsProps> = ({ orderId }) => {
               </TableFooter>
             </Table>
           </div>
+        ) : (
+          <OrderDetailsSkeleton />
         )}
       </DialogContent>
     </Dialog>

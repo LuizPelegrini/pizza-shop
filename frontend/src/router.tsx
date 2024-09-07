@@ -7,12 +7,13 @@ import { Dashboard } from './pages/app/dashboard'
 import { OrdersPage } from './pages/app/orders'
 import { SignIn } from './pages/auth/sign-in'
 import { SignUp } from './pages/auth/sign-up'
+import { Error } from './pages/_error'
 
 export const router = createBrowserRouter([
   {
     path: '/',
     Component: AppLayout,
-    errorElement: <NotFound />,
+    errorElement: <Error />,
     children: [
       { path: '/', Component: Dashboard },
       { path: '/orders', Component: OrdersPage },
@@ -26,4 +27,9 @@ export const router = createBrowserRouter([
       { path: '/sign-up', Component: SignUp },
     ],
   },
+  {
+    // if no route matched, show 404
+    path: '*',
+    Component: NotFound,
+  }
 ])
