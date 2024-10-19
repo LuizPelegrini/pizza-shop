@@ -4,7 +4,7 @@ import {
   ChevronsLeft,
   ChevronsRight,
 } from 'lucide-react'
-import { FC, MouseEventHandler } from 'react'
+import { FC } from 'react'
 
 import { Button } from './ui/button'
 import { useSearchParams } from 'react-router-dom'
@@ -45,6 +45,7 @@ export const Pagination: FC<PaginationProps> = ({
         </div>
         <div className="flex items-center gap-2">
           <Button
+            data-testid="first-page-button"
             variant="outline"
             size="icon"
             onClick={() => handlePageChange(1)}
@@ -55,6 +56,7 @@ export const Pagination: FC<PaginationProps> = ({
           </Button>
 
           <Button
+            data-testid="previous-page-button"
             variant="outline"
             size="icon"
             onClick={() => handlePageChange(currentPage - 1)}
@@ -65,6 +67,7 @@ export const Pagination: FC<PaginationProps> = ({
           </Button>
 
           <Button
+            data-testid="next-page-button"
             variant="outline"
             size="icon"
             onClick={() => handlePageChange(currentPage + 1)}
@@ -75,6 +78,7 @@ export const Pagination: FC<PaginationProps> = ({
           </Button>
 
           <Button
+            data-testid="last-page-button"
             variant="outline"
             size="icon"
             onClick={() => handlePageChange(lastPage)}
