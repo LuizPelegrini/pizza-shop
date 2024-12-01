@@ -79,7 +79,7 @@ export const SignIn = () => {
         <form className="space-y-4" onSubmit={handleSubmit(handleSignIn)}>
           <div className="space-y-2">
             <Label htmlFor="email">E-mail</Label>
-            <Input id="email" type="email" {...register('email')} />
+            <Input id="email" type="email" data-testid="email" {...register('email')} />
           </div>
           <Button disabled={isSubmitting} className="w-full" type="submit">
             Access dashboard
