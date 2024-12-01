@@ -1,4 +1,4 @@
-import { act, render } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Pagination } from './pagination';
 import { BrowserRouter, MemoryRouter } from 'react-router-dom';
@@ -46,9 +46,7 @@ describe('Pagination', () => {
     });
 
     const user = userEvent.setup();
-    await act(async () => {
-      await user.click(nextPageButtonElement);
-    })
+    await user.click(nextPageButtonElement);
 
     expect(new URLSearchParams(location.search).get('page')).toEqual('2');
   })
@@ -64,10 +62,36 @@ describe('Pagination', () => {
     });
 
     const user = userEvent.setup();
-    await act(async () => {
-      await user.click(previousButtonElement);
-    })
+    await user.click(previousButtonElement);
 
     expect(new URLSearchParams(location.search).get('page')).toEqual('1');
+  })
+
+  it('should be able to navigate to first page', async () => {
+    // start on page 2
+    new URLSearchParams(location.search).set('page', '2')
+
+    const wrapper = render(<Pagination totalCount={100} perPage={10} />, { wrapper: BrowserRouter })
+
+    const firstPageButtonElement = wrapper.getByRole('button', {
+      name: 'First page'
+    })
+
+    const user = userEvent.setup();
+    await user.click(firstPageButtonElement)
+
+    expect(new URLSearchParams(location.search).get('page')).toEqual('1')
+  });
+
+  it('should be able to navigate to last page', async () => {
+    const wrapper = render(<Pagination totalCount={100} perPage={10} />, { wrapper: BrowserRouter })
+    const lastPageButtonElement = wrapper.getByRole('button', {
+      name: 'Last page'
+    });
+
+    const user = userEvent.setup();
+    await user.click(lastPageButtonElement);
+
+    expect(new URLSearchParams(location.search).get('page')).toEqual('10')
   })
 });
